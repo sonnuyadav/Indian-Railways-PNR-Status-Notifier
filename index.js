@@ -4,6 +4,7 @@ var request = require('request'),
     log4js = require('log4js'),
     jar = request.jar(),
     redis = require("redis"),
+    //client = redis.createClient(6000, "127.0.0.1", {});
     client = redis.createClient();
 
 var pnrCheckURL = 'http://www.indianrail.gov.in/cgi_bin/inet_pnstat_cgi_10521.cgi',
@@ -43,7 +44,6 @@ log4js.configure({
 });
 
 var logger = log4js.getLogger('info');
-
     // Uncomment to debug.
     // logger = console;    
 
@@ -94,7 +94,7 @@ var checkPNR = function() {
             // Possible when the server does not return expected HTML.
             // Server side issues.
             
-            logger.log("Something is wrong!");
+            logger.error("Something is wrong!");
             return;
         }
 
@@ -120,17 +120,17 @@ var checkPNR = function() {
                 // Something has changed
 
                 client.set("status", status);
-                logger.log("Status has changed");
+                logger.info("Status has changed");
 
                 sendMail(status, oldStatus);
             }else{
-                //logger.log("Status hasn't changed");
+                //logger.info("Status hasn't changed");
             }
         });
     });
 };
 
 client.on("connect", function () {
-    logger.log("Client connected");
-    handle = setInterval(checkPNR, 3000);
+    logger.info("Client connected");
+    handle = setInterval(checkPNR, config.interval);
 });
