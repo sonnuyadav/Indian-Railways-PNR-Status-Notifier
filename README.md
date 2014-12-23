@@ -1,5 +1,5 @@
-# Indian Railways PNR Check #
-Polls the Indian Railways server for updates and sends and email when the status changes
+# Indian Railways PNR Status Notifier #
+Polls the Indian Railways server for updates and sends an email when the status changes
 
 ### Usage
 
