@@ -4,5 +4,8 @@
 	"gmail_password": "",
 	"smtpServer": "smtp.gmail.com",
 	"destination_email": "",
-	"pnr": 0000000000
+	"pnrs": [
+		0000000000,
+		0000000001
+	]
 }

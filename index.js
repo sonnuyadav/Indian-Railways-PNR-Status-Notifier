@@ -48,10 +48,10 @@ var logger = log4js.getLogger('info');
     // logger = console;    
 
 // Send an email to destination_email when the status changes.
-var sendMail = function(status, oldStatus) {
+var sendMail = function(pnr, status, oldStatus) {
 
     // Edit the email text as required.
-    mailMessage.text = "PNR Status for ticket " + config.pnr
+    mailMessage.text = "PNR Status for ticket " + pnr
                         + " has changed to " + status + " from " + oldStatus;
     
     mailServer.send(mailMessage, function(err, message) {
@@ -65,8 +65,15 @@ var sendMail = function(status, oldStatus) {
     });
 };
 
-var checkPNR = function() {
-    logger.info("Checking for updates...");
+var check = function(){
+    config.pnrs.forEach(function(pnr){
+        checkPNR(pnr);
+    });
+};
+
+var checkPNR = function(pnr) {
+
+    logger.info("Checking " + pnr + " for updates...");
     request.post({
         url: pnrCheckURL,
         jar: jar,
@@ -77,7 +84,7 @@ var checkPNR = function() {
 
         // Fake captcha.
         form: {
-            "lccp_pnrno1": config.pnr,
+            "lccp_pnrno1": pnr,
             "lccp_cap_val": "12345",
             "lccp_capinp_val": "12345"
         }
@@ -103,7 +110,7 @@ var checkPNR = function() {
             // Current Status field
             status = $('td.table_border_both').eq(10).text();
 
-        client.get("status", function (err, reply) {
+        client.get(pnr, function (err, reply) {
             if(err){
                 logger.error("Error fetching details from redis", err);
                 
@@ -119,10 +126,10 @@ var checkPNR = function() {
             if(oldStatus !== status){
                 // Something has changed
 
-                client.set("status", status);
+                client.set(pnr, status);
                 logger.info("Status has changed");
 
-                sendMail(status, oldStatus);
+                sendMail(pnr, status, oldStatus);
             }else{
                 //logger.info("Status hasn't changed");
             }
@@ -132,5 +139,5 @@ var checkPNR = function() {
 
 client.on("connect", function () {
     logger.info("Client connected");
-    handle = setInterval(checkPNR, config.interval);
+    handle = setInterval(check, config.interval);
 });
