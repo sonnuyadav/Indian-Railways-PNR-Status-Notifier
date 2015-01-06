@@ -12,7 +12,7 @@ Polls the Indian Railways server for updates and sends an email when the status 
 	  - `destination_email`: Add a destination email to receive the email when the results are out
 	  - `smtpServer`: Mail Server to use
 	  - `interval`: Check for the status after every x milliseconds
-	  - `pnr`: PNR number to be used
+	  - `pnrs`: Array of PNR numbers to check
 
  - Set the `log4js` output file
 
